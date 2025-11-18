@@ -2067,9 +2067,21 @@
                 
             } catch (error) {
                 console.error('Airtable提交失败:', error);
-                saveOrder(order);
-                alert(`⚠️ 订单提交成功（本地保存）！\n订单编号: ${order.orderId}\n总费用: RM${totalPrice.toFixed(2)}\n\n由于网络问题，请截图保存此订单信息并联系客服。`);
-            }
+                 // 显示详细错误信息
+        let errorMessage = `Airtable提交失败: ${error.message}`;
+        if (error.message.includes('403')) {
+            errorMessage += '\n\n可能原因：API Key无效或权限不足';
+        } else if (error.message.includes('404')) {
+            errorMessage += '\n\n可能原因：Base ID错误或表不存在';
+        } else if (error.message.includes('422')) {
+            errorMessage += '\n\n可能原因：字段名称不匹配或数据类型错误';
+        }
+        
+        alert(`⚠️ ${errorMessage}\n\n订单已本地保存，请联系技术支持。`);
+        
+        // 保存到本地
+        saveOrder(order);
+    }
             
             showPage('karaoke');
             setActiveNav(document.getElementById('karaoke-nav'));
